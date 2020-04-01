@@ -98,15 +98,24 @@ def test_log_subproc_and_echo_output(capfd, tmpdir):
             assert f.read() == 'logged\n'
 
 
+#
+# Tests below use a pseudoterminal to test llnl.util.tty.log
+#
+
 def mock_logger(attrs):
     """Mock logger (child) process for testing log.keyboard_input."""
     def handler(signum, frame):
         running[0] = False
     signal.signal(signal.SIGUSR1, handler)
 
-    running = [True]
-    i = 0
-    with log_output("log.txt"):
+    with log_output("log.txt") as logger:
+        # zero is always force-echoed
+        with logger.force_echo():
+            print(0)
+
+        # additional numbers are just printed
+        i = 1
+        running = [True]
         while running[0]:
             print(i)
             i += 1
@@ -455,7 +464,11 @@ def test_foreground_background_with_output(test_fn, capfd, termios_on_or_off):
     numbers = set([int(n) for n in split])
     all_numbers = set(range(shell.attrs["count"]))
 
+    # test that force echo works
+    assert 0 in numbers
+
     # all numbers are really output we expect
     assert numbers <= all_numbers
+
     # only some are present, since we enable and disable output with 'v'
     assert len(numbers) < len(all_numbers)
