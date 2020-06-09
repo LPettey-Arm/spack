@@ -15,11 +15,12 @@ import pytest
 import llnl.util.filesystem as fs
 
 import spack.config
+import spack.compilers as compilers
 import spack.hash_types as ht
 import spack.package
 import spack.cmd.install
 from spack.error import SpackError
-from spack.spec import Spec
+from spack.spec import Spec, CompilerSpec
 from spack.main import SpackCommand
 import spack.environment as ev
 
@@ -632,6 +633,30 @@ def test_install_only_dependencies(tmpdir, mock_fetch, install_mockery):
     assert not os.path.exists(root.prefix)
 
 
+def test_install_only_package(tmpdir, mock_fetch, install_mockery, capfd):
+    msg = ''
+    with capfd.disabled():
+        try:
+            install('--only', 'package', 'dependent-install')
+        except spack.installer.InstallError as e:
+            msg = str(e)
+
+    assert 'Cannot proceed with dependent-install'  in msg
+    assert '1 uninstalled dependency' in msg
+
+
+def test_install_deps_then_package(tmpdir, mock_fetch, install_mockery):
+    dep = Spec('dependency-install').concretized()
+    root = Spec('dependent-install').concretized()
+
+    install('--only', 'dependencies', 'dependent-install')
+    assert os.path.exists(dep.prefix)
+    assert not os.path.exists(root.prefix)
+
+    install('--only', 'package', 'dependent-install')
+    assert os.path.exists(root.prefix)
+
+
 @pytest.mark.regression('12002')
 def test_install_only_dependencies_in_env(tmpdir, mock_fetch, install_mockery,
                                           mutable_mock_env_path):
@@ -694,3 +719,30 @@ def test_cdash_auth_token(tmpdir, install_mockery, capfd):
                 '--log-format=cdash',
                 'a')
             assert 'Using CDash auth token from environment' in out
+
+
+def test_compiler_bootstrap(
+        install_mockery_mutable_config, mock_packages, mock_fetch,
+        mock_archive, mutable_config, monkeypatch):
+    monkeypatch.setattr(spack.concretize.Concretizer,
+                        'check_for_compiler_existence', False)
+    spack.config.set('config:install_missing_compilers', True)
+    assert CompilerSpec('gcc@2.0') not in compilers.all_compiler_specs()
+
+    # Test succeeds if it does not raise an error
+    install('a%gcc@2.0')
+
+
+@pytest.mark.regression('16221')
+def test_compiler_bootstrap_already_installed(
+        install_mockery_mutable_config, mock_packages, mock_fetch,
+        mock_archive, mutable_config, monkeypatch):
+    monkeypatch.setattr(spack.concretize.Concretizer,
+                        'check_for_compiler_existence', False)
+    spack.config.set('config:install_missing_compilers', True)
+
+    assert CompilerSpec('gcc@2.0') not in compilers.all_compiler_specs()
+
+    # Test succeeds if it does not raise an error
+    install('gcc@2.0')
+    install('a%gcc@2.0')
