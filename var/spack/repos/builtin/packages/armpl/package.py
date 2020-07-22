@@ -3,25 +3,8 @@
 #
 # SPDX-License-Identifier: (Apache-2.0 OR MIT)
 
-# ----------------------------------------------------------------------------
-# If you submit this package back to Spack as a pull request,
-# please first remove this boilerplate and all FIXME comments.
-#
-# This is a template package file for Spack.  We've put "FIXME"
-# next to all the things you'll want to change. Once you've handled
-# them, you can save this file and test your package like this:
-#
-#     spack install armpl
-#
-# You can edit this file again by typing:
-#
-#     spack edit armpl
-#
-# See the Spack documentation for more information on packaging.
-# ----------------------------------------------------------------------------
 
 from spack import *
-import subprocess
 from spack.concretize import NoBuildError
 from spack.util.module_cmd import module
 from spack.util.module_cmd import get_path_args_from_module_line
@@ -58,53 +41,6 @@ class Armpl(Package):
     provides("lapack")
     provides("scalapack")
     provides("fftw-api@3")
-
-#    print(self.modname)
-
-#    if modname==None:
-#        if spec.os=='rhel7' or spec.os=='amzn2':
-#            url = ("https://developer.arm.com/-/media/Files/downloads/hpc/arm-performance-libraries/" 
-#                    "20-2-0/RHEL7/arm-performance-libraries_20.2_RHEL-7_gcc-7.1.tar", when('%gcc@7'))
-#            filename=("arm-performance-libraries_20.2_RHEL-7_gcc-7.1.sh", when('%gcc@7'))
-#            url = ("https://developer.arm.com/-/media/Files/downloads/hpc/arm-performance-libraries/"
-#                    "20-2-0/RHEL7/arm-performance-libraries_20.2_RHEL-7_gcc-8.2.tar", when('%gcc@8'))
-#            filename=("arm-performance-libraries_20.2_RHEL-7_gcc-8.2.sh", when('%gcc@8'))
-#            url = ("https://developer.arm.com/-/media/Files/downloads/hpc/arm-performance-libraries/"
-#                    "20-2-0/RHEL7/arm-performance-libraries_20.2_RHEL-7_gcc-9.3.tar", when('%gcc@9'))
-#            filename=("arm-performance-libraries_20.2_RHEL-7_gcc-9.3.sh", when('%gcc@9'))
-#        elif spec.os=='rhel8':
-#            url = ("https://developer.arm.com/-/media/Files/downloads/hpc/arm-performance-libraries/"
-#                    "20-2-0/RHEL8/arm-performance-libraries_20.2_RHEL-8_gcc-8.2.tar", when('%gcc@8'))
-#            filename=("arm-performance-libraries_20.2_RHEL-8_gcc-8.2.sh", when('%gcc@8'))
-#            url = ("https://developer.arm.com/-/media/Files/downloads/hpc/arm-performance-libraries/"
-#                    "20-2-0/RHEL8/arm-performance-libraries_20.2_RHEL-8_gcc-9.3.tar", when('%gcc@9'))
-#            filename=("arm-performance-libraries_20.2_RHEL-8_gcc-9.3.sh", when('%gcc@9'))
-#        elif spec.os=='sles15':
-#            url = ("https://developer.arm.com/-/media/Files/downloads/hpc/arm-performance-libraries/"
-#                    "20-2-0/SUSE15/arm-performance-libraries_20.2_SLES-15_gcc-8.2.tar", when('%gcc@8'))
-#            filename=("arm-performance-libraries_20.2_SLES-15_gcc-8.2.sh", when('%gcc@8'))
-#            url = ("https://developer.arm.com/-/media/Files/downloads/hpc/arm-performance-libraries/"
-#                    "20-2-0/SUSE15/arm-performance-libraries_20.2_SLES-15_gcc-9.3.tar", when('%gcc@9'))
-#            filename=("arm-performance-libraries_20.2_SLES-15_gcc-9.3.sh", when('%gcc@9'))
-#        elif spec.os=='ubun16':
-#            url = ("https://developer.arm.com/-/media/Files/downloads/hpc/arm-performance-libraries/"
-#                    "20-2-0/Ubuntu16.04/arm-performance-libraries_20.2_Ubuntu-16.04_gcc-7.1.tar", when('%gcc7'))
-#            filename=("arm-performance-libraries_20.2_Ubuntu-16.04_gcc-7.1.sh", when('%gcc@7'))
-#            url = ("https://developer.arm.com/-/media/Files/downloads/hpc/arm-performance-libraries/"
-#                    "20-2-0/Ubuntu16.04/arm-performance-libraries_20.2_Ubuntu-16.04_gcc-8.2.tar", when('%gcc8'))
-#            filename=("arm-performance-libraries_20.2_Ubuntu-16.04_gcc-8.2.sh", when('%gcc@8'))
-#            url = ("https://developer.arm.com/-/media/Files/downloads/hpc/arm-performance-libraries/"
-#                    "20-2-0/Ubuntu16.04/arm-performance-libraries_20.2_Ubuntu-16.04_gcc-9.3.tar", when('%gcc9'))
-#            filename=("arm-performance-libraries_20.2_Ubuntu-16.04_gcc-9.3.sh", when('%gcc@9'))
-
-            
-#    @property
-#    def external_prefix(self):
-#        armpl_module = module("show",self.modname).splitlines()
-
-#        for line in armpl_module:
-#            if "LD_LIBRARY_PATH" in line:
-#                return get_path_args_from_module_line(line)[0]
 
     @property
     def blas_libs(self):
