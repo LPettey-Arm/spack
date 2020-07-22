@@ -1,0 +1,169 @@
+# Copyright 2013-2020 Lawrence Livermore National Security, LLC and other
+# Spack Project Developers. See the top-level COPYRIGHT file for details.
+#
+# SPDX-License-Identifier: (Apache-2.0 OR MIT)
+
+# ----------------------------------------------------------------------------
+# If you submit this package back to Spack as a pull request,
+# please first remove this boilerplate and all FIXME comments.
+#
+# This is a template package file for Spack.  We've put "FIXME"
+# next to all the things you'll want to change. Once you've handled
+# them, you can save this file and test your package like this:
+#
+#     spack install armpl
+#
+# You can edit this file again by typing:
+#
+#     spack edit armpl
+#
+# See the Spack documentation for more information on packaging.
+# ----------------------------------------------------------------------------
+
+from spack import *
+import subprocess
+from spack.concretize import NoBuildError
+from spack.util.module_cmd import module
+from spack.util.module_cmd import get_path_args_from_module_line
+
+
+class Armpl(Package):
+    """Arm performance Libraries provid advanced math function tuned for Arm processors.  
+       You must edit your packages.yaml file to point to the system modules and set buildable=false. 
+       See https://spack.readthedocs.io/en/latest/build_settings.html?highlight=buildable%3Dfalse#external-packages 
+       for more details."""
+
+    homepage = "https://developer.arm.com/tools-and-software/server-and-hpc/downloads/arm-performance-libraries"
+    url = "https://developer.arm.com/tools-and-software/server-and-hpc/downloads/arm-performance-libraries"
+
+    version("20.2.0")
+    version("20.1.0")
+    version("20.0.0")
+
+    variant('sve',default=False, description='Include SVE optimized instructions')
+    variant(
+        'march',
+        default=' ',
+        description='Overide native cpu and specify -march flag',
+        values=(' ','armv8-a','armv8.1-a','armv8.2-a','armv8.3-a','armv8.4-a'),
+        multi=False
+    )
+    variant('ilp64',default=False, description='use ilp64 specific Armpl library')
+    variant('lp64',default=False, description='use  lp64 specific Armpl library')
+    variant('int64',default=False, description='use int64 specific Armpl library')
+    variant('mp', default=False, description='use OpenMp specific Armpl library')
+    variant("shared", default=True, description="enable shared libs")
+
+    provides("blas")
+    provides("lapack")
+    provides("scalapack")
+    provides("fftw-api@3")
+
+#    print(self.modname)
+
+#    if modname==None:
+#        if spec.os=='rhel7' or spec.os=='amzn2':
+#            url = ("https://developer.arm.com/-/media/Files/downloads/hpc/arm-performance-libraries/" 
+#                    "20-2-0/RHEL7/arm-performance-libraries_20.2_RHEL-7_gcc-7.1.tar", when('%gcc@7'))
+#            filename=("arm-performance-libraries_20.2_RHEL-7_gcc-7.1.sh", when('%gcc@7'))
+#            url = ("https://developer.arm.com/-/media/Files/downloads/hpc/arm-performance-libraries/"
+#                    "20-2-0/RHEL7/arm-performance-libraries_20.2_RHEL-7_gcc-8.2.tar", when('%gcc@8'))
+#            filename=("arm-performance-libraries_20.2_RHEL-7_gcc-8.2.sh", when('%gcc@8'))
+#            url = ("https://developer.arm.com/-/media/Files/downloads/hpc/arm-performance-libraries/"
+#                    "20-2-0/RHEL7/arm-performance-libraries_20.2_RHEL-7_gcc-9.3.tar", when('%gcc@9'))
+#            filename=("arm-performance-libraries_20.2_RHEL-7_gcc-9.3.sh", when('%gcc@9'))
+#        elif spec.os=='rhel8':
+#            url = ("https://developer.arm.com/-/media/Files/downloads/hpc/arm-performance-libraries/"
+#                    "20-2-0/RHEL8/arm-performance-libraries_20.2_RHEL-8_gcc-8.2.tar", when('%gcc@8'))
+#            filename=("arm-performance-libraries_20.2_RHEL-8_gcc-8.2.sh", when('%gcc@8'))
+#            url = ("https://developer.arm.com/-/media/Files/downloads/hpc/arm-performance-libraries/"
+#                    "20-2-0/RHEL8/arm-performance-libraries_20.2_RHEL-8_gcc-9.3.tar", when('%gcc@9'))
+#            filename=("arm-performance-libraries_20.2_RHEL-8_gcc-9.3.sh", when('%gcc@9'))
+#        elif spec.os=='sles15':
+#            url = ("https://developer.arm.com/-/media/Files/downloads/hpc/arm-performance-libraries/"
+#                    "20-2-0/SUSE15/arm-performance-libraries_20.2_SLES-15_gcc-8.2.tar", when('%gcc@8'))
+#            filename=("arm-performance-libraries_20.2_SLES-15_gcc-8.2.sh", when('%gcc@8'))
+#            url = ("https://developer.arm.com/-/media/Files/downloads/hpc/arm-performance-libraries/"
+#                    "20-2-0/SUSE15/arm-performance-libraries_20.2_SLES-15_gcc-9.3.tar", when('%gcc@9'))
+#            filename=("arm-performance-libraries_20.2_SLES-15_gcc-9.3.sh", when('%gcc@9'))
+#        elif spec.os=='ubun16':
+#            url = ("https://developer.arm.com/-/media/Files/downloads/hpc/arm-performance-libraries/"
+#                    "20-2-0/Ubuntu16.04/arm-performance-libraries_20.2_Ubuntu-16.04_gcc-7.1.tar", when('%gcc7'))
+#            filename=("arm-performance-libraries_20.2_Ubuntu-16.04_gcc-7.1.sh", when('%gcc@7'))
+#            url = ("https://developer.arm.com/-/media/Files/downloads/hpc/arm-performance-libraries/"
+#                    "20-2-0/Ubuntu16.04/arm-performance-libraries_20.2_Ubuntu-16.04_gcc-8.2.tar", when('%gcc8'))
+#            filename=("arm-performance-libraries_20.2_Ubuntu-16.04_gcc-8.2.sh", when('%gcc@8'))
+#            url = ("https://developer.arm.com/-/media/Files/downloads/hpc/arm-performance-libraries/"
+#                    "20-2-0/Ubuntu16.04/arm-performance-libraries_20.2_Ubuntu-16.04_gcc-9.3.tar", when('%gcc9'))
+#            filename=("arm-performance-libraries_20.2_Ubuntu-16.04_gcc-9.3.sh", when('%gcc@9'))
+
+            
+#    @property
+#    def external_prefix(self):
+#        armpl_module = module("show",self.modname).splitlines()
+
+#        for line in armpl_module:
+#            if "LD_LIBRARY_PATH" in line:
+#                return get_path_args_from_module_line(line)[0]
+
+    @property
+    def blas_libs(self):
+        shared = True if "+shared" in self.spec else False
+        if "+ilp64" in self.spec and "+mp" in self.spec:
+            libname = "libarmpl_ilp64_mp"
+        elif  "+ilp64" in self.spec:
+            libname = "libarmpl_ilp64"
+        elif "+int64" in self.spec and "+mp" in self.spec:
+            libname = "libarmpl_int64_mp"
+        elif  "+int64" in self.spec:
+            libname = "libarmpl_int64"
+        elif "+lp64" in self.spec and "+mp" in self.spec:
+            libname = "libarmpl_lp64_mp"
+        elif  "+ilp64" in self.spec:
+            libname = "libarmpl_lp64"
+        elif "+mp" in self.spec:
+            libname = "libarmpl_mp"
+        else:
+            libname ="libarmpl"
+
+        return find_libraries(
+            libname,
+            root=self.prefix,
+            shared=shared,
+            recursive=False)
+
+    @property
+    def lapack_libs(self):
+        return self.blas_libs
+
+    @property
+    def scalapack_libs(self):
+        return self.blas_libs
+
+    @property
+    def fftw_libs(self):
+        return self.blas_libs
+
+    
+    def flag_handler(self, name, flags):
+        if name in ['cflags', 'cxxflags', 'cppflags', 'ldflags'] and arm==spec.compiler.name and self.march!=' ':
+            flags.append('-march={0} -armpl',self.march)
+            return (None, flags, None)
+        elif name in ['cflags', 'cxxflags', 'cppflags', 'ldflags'] and arm==spec.compiler.name:
+            flags.append('-mcpu=native -armpl')
+            return (None, flags, None)
+        elif name in ['cflags', 'cxxflags', 'cppflags'] and gcc==spec.compiler.name and self.march!=' ':
+            flags.append('-march={0}', self.march)
+            return (None, flags, None)
+        elif name in ['ldflags'] and gcc==spec.compiler.name:
+            flags.append('-lgfortran')
+            return (None, flags, None)
+        return (flags, None, None)
+
+
+    def install(self, spec, prefix):
+        #if self.modname==None:
+        #    subprocess.call(self.filename)
+        #else:
+        raise NoBuildError(spec)
+
