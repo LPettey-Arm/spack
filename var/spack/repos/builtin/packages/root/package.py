@@ -235,6 +235,7 @@ class Root(CMakePackage):
     depends_on('r',         when='+r', type=('build', 'run'))
     depends_on('r-rcpp',    when='+r', type=('build', 'run'))
     depends_on('r-rinside', when='+r', type=('build', 'run'))
+    depends_on('readline',  when='+r')
     depends_on('shadow',    when='+shadow')
     depends_on('sqlite',    when='+sqlite')
     depends_on('tbb',       when='+tbb')
@@ -381,7 +382,7 @@ class Root(CMakePackage):
                 ['pythia8'],
                 ['qt', 'qt4'],  # See conflicts
                 ['qtgsi', 'qt4'],  # See conflicts
-                ['r', 'R'],
+                ['r', 'r'],
                 ['rfio', False],
                 ['roofit'],
                 ['root7'],  # See conflicts
@@ -492,12 +493,16 @@ class Root(CMakePackage):
         env.prepend_path('PATH', self.prefix.bin)
         env.append_path('CMAKE_MODULE_PATH', '{0}/cmake'
                         .format(self.prefix))
+        if "+rpath" not in self.spec:
+            env.prepend_path('LD_LIBRARY_PATH', self.prefix.lib)
 
     def setup_dependent_run_environment(self, env, dependent_spec):
         env.set('ROOTSYS', self.prefix)
         env.set('ROOT_VERSION', 'v{0}'.format(self.version.up_to(1)))
         env.prepend_path('PYTHONPATH', self.prefix.lib)
         env.prepend_path('PATH', self.prefix.bin)
+        if "+rpath" not in self.spec:
+            env.prepend_path('LD_LIBRARY_PATH', self.prefix.lib)
 
     def _process_opts(self, *opt_lists):
         """Process all provided boolean option lists into CMake arguments.

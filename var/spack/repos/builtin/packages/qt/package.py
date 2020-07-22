@@ -158,6 +158,7 @@ class Qt(Package):
     # Non-macOS dependencies and special macOS constraints
     if MACOS_VERSION is None:
         depends_on("fontconfig", when='freetype=spack')
+        depends_on("libsm")
         depends_on("libx11")
         depends_on("libxcb")
         depends_on("libxkbcommon")
@@ -286,7 +287,7 @@ class Qt(Package):
             "qmake/qmake.pri",
             "src/tools/bootstrap/bootstrap.pro"
         ]
-        if '%clang' in self.spec:
+        if '%clang' in self.spec or '%apple-clang' in self.spec:
             files_to_filter += [
                 "mkspecs/unsupported/macx-clang-libc++/qmake.conf",
                 "mkspecs/common/clang.conf"
