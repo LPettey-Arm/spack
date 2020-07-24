@@ -1,0 +1,54 @@
+From 792684b8a35b462d918569d62dab53a46495cbc1 Mon Sep 17 00:00:00 2001
+From: Lucas Pettey <lucas.pettey@arm.com>
+Date: Tue, 7 Apr 2020 15:11:34 +0000
+Subject: [PATCH] Altering Arm compielr version check to remove else clause and
+ be more consistent with other compielr version checks. Added test case so
+ both the 'if' and 'else' conditionals of the Arm compiler version check have
+ a test case
+
+---
+ lib/spack/spack/compilers/arm.py  | 3 +--
+ lib/spack/spack/test/compilers.py | 8 +++++++-
+ 2 files changed, 8 insertions(+), 3 deletions(-)
+
+diff --git a/lib/spack/spack/compilers/arm.py b/lib/spack/spack/compilers/arm.py
+index a878fae73..ca17ff42e 100644
+--- a/lib/spack/spack/compilers/arm.py
++++ b/lib/spack/spack/compilers/arm.py
+@@ -43,13 +43,12 @@ class Arm(spack.compiler.Compiler):
+     def extract_version_from_output(cls, output):
+         """Extracts the version from compiler's output."""
+         match = re.search(cls.version_regex, output)
++        temp = 'unknown'
+         if match:
+             if match.group(1).count('.') == 1:
+                 temp = match.group(1) + ".0." + match.group(2)
+             else:
+                 temp = match.group(1) + "." + match.group(2)
+-        else:
+-            temp = 'unknown'
+         return temp
+ 
+     @classmethod
+diff --git a/lib/spack/spack/test/compilers.py b/lib/spack/spack/test/compilers.py
+index f71edd71b..13e3d9e69 100644
+--- a/lib/spack/spack/test/compilers.py
++++ b/lib/spack/spack/test/compilers.py
+@@ -369,7 +369,13 @@ def test_clang_version_detection(version_str, expected_version):
+      'Thread model: posix\n'
+      'InstalledDir:\n'
+      '/opt/arm/arm-hpc-compiler-19.0_Generic-AArch64_RHEL-7_aarch64-linux/bin\n', # NOQA
+-     '19.0.0.73')
++     '19.0.0.73'),
++    ('Arm C/C++/Fortran Compiler version 19.3.1 (build number 75) (based on LLVM 7.0.2)\n' # NOQA
++     'Target: aarch64--linux-gnu\n'
++     'Thread model: posix\n'
++     'InstalledDir:\n'
++     '/opt/arm/arm-hpc-compiler-19.0_Generic-AArch64_RHEL-7_aarch64-linux/bin\n', # NOQA
++     '19.3.1.75')
+ ])
+ def test_arm_version_detection(version_str, expected_version):
+     version = spack.compilers.arm.Arm.extract_version_from_output(version_str)
+-- 
+2.23.1
+

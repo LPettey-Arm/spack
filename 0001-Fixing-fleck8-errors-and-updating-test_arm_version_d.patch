@@ -1,0 +1,56 @@
+From dedf07931e9913dc54e1cfb1acbfe3d076599aa4 Mon Sep 17 00:00:00 2001
+From: EC2 Default User <ec2-user@ip-172-31-7-135.us-east-2.compute.internal>
+Date: Wed, 1 Apr 2020 19:34:39 +0000
+Subject: [PATCH] Fixing fleck8 errors and updating test_arm_version_detection
+ function for more detailed Arm compielr version detection
+
+---
+ lib/spack/spack/compilers/arm.py  | 8 ++++----
+ lib/spack/spack/test/compilers.py | 2 +-
+ 2 files changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/lib/spack/spack/compilers/arm.py b/lib/spack/spack/compilers/arm.py
+index 01f3c4e7a..a809b4c42 100644
+--- a/lib/spack/spack/compilers/arm.py
++++ b/lib/spack/spack/compilers/arm.py
+@@ -35,13 +35,12 @@ class Arm(spack.compiler.Compiler):
+     # InstalledDir:
+     # /opt/arm/arm-hpc-compiler-19.0_Generic-AArch64_RHEL-7_aarch64-linux/bin
+     version_argument = '--version'
+-    version_regex = r'Arm C\/C\+\+\/Fortran Compiler version ([\d\.]+) \(build number (\d+)\) '
+-    
++    version_regex = r'Arm C\/C\+\+\/Fortran Compiler version ([\d\.]+) '\
++                    '\(build number (\d+)\) '
++
+     @classmethod
+-    
+     def extract_version_from_output(cls, output):
+         """Extracts the version from compiler's output."""
+-        
+         match = re.search(cls.version_regex, output)
+         if match:
+             if match.group(1).count('.') == 1:
+@@ -51,6 +50,7 @@ def extract_version_from_output(cls, output):
+         else:
+             temp = 'unknown'
+         return temp
++
+     @classmethod
+     def verbose_flag(cls):
+         return "-v"
+diff --git a/lib/spack/spack/test/compilers.py b/lib/spack/spack/test/compilers.py
+index 51eedd748..f71edd71b 100644
+--- a/lib/spack/spack/test/compilers.py
++++ b/lib/spack/spack/test/compilers.py
+@@ -369,7 +369,7 @@ def test_clang_version_detection(version_str, expected_version):
+      'Thread model: posix\n'
+      'InstalledDir:\n'
+      '/opt/arm/arm-hpc-compiler-19.0_Generic-AArch64_RHEL-7_aarch64-linux/bin\n', # NOQA
+-     '19.0')
++     '19.0.0.73')
+ ])
+ def test_arm_version_detection(version_str, expected_version):
+     version = spack.compilers.arm.Arm.extract_version_from_output(version_str)
+-- 
+2.23.1
+
